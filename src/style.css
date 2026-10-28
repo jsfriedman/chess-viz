@@ -1,0 +1,39 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-board-light: var(--board-light);
+  --color-board-dark: var(--board-dark);
+  --color-mark-selected: var(--mark-selected);
+  --color-mark-correct: var(--mark-correct);
+  --color-mark-wrong: var(--mark-wrong);
+  --color-mark-missed: var(--mark-missed);
+  --color-arrow-attack: var(--arrow-attack);
+  --color-arrow-defend: var(--arrow-defend);
+}
+
+:root {
+  --board-light: #ebecd0;
+  --board-dark: #739552;
+  --mark-selected: #3b82f6;
+  --mark-correct: #16a34a;
+  --mark-wrong: #dc2626;
+  --mark-missed: #f59e0b;
+  --arrow-attack: #e8590c;
+  --arrow-defend: #1c7ed6;
+  --accent: #0f766e;
+  --accent-foreground: #ffffff;
+  color-scheme: light;
+}
+
+:root.dark {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-stone-50 font-sans text-stone-900 antialiased dark:bg-stone-950 dark:text-stone-100;
+}
