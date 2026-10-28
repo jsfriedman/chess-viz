@@ -7,36 +7,35 @@ import HangingExplanation from '@/components/HangingExplanation.vue'
 import MovesExplanation from '@/components/MovesExplanation.vue'
 import StepIndicator from '@/components/StepIndicator.vue'
 import { parsePlacement, sideToMove, type Square } from '@/chess/board'
-import { explainSquare, explanationArrows, type ScanStepId } from '@/chess/explain'
-import { findHangingSquares } from '@/chess/hanging'
-import { findCapturableSquares, findCheckingSquares } from '@/chess/scan'
-import { boardScanItem } from '@/mock/mockData'
+import { explainSquare, explanationArrows } from '@/chess/explain'
+import { useBoardScanSession } from '@/drills/boardScan/sessionStore'
+import { scanSteps } from '@/drills/boardScan/steps'
 
 const router = useRouter()
-const placement = parsePlacement(boardScanItem.fen)
-const toMove = sideToMove(boardScanItem.fen) === 'w' ? 'White' : 'Black'
+const session = useBoardScanSession()
+if (!session.inProgress) session.start()
 
 const stepIndex = ref(0)
 const selectedSquares = ref<ReadonlySet<Square>>(new Set())
 const submitted = ref(false)
 const inspectedSquare = ref<Square>()
 
-const answerFinders: Readonly<Record<ScanStepId, (fen: string) => Square[]>> = {
-  checks: findCheckingSquares,
-  captures: findCapturableSquares,
-  hanging: findHangingSquares,
-}
-
-const currentStep = computed(() => boardScanItem.steps[stepIndex.value]!)
-const isLastStep = computed(() => stepIndex.value === boardScanItem.steps.length - 1)
-const currentAnswer = computed(() => new Set(answerFinders[currentStep.value.id](boardScanItem.fen)))
+const fen = computed(() => session.currentFen!)
+const placement = computed(() => parsePlacement(fen.value))
+const toMove = computed(() => (sideToMove(fen.value) === 'w' ? 'White' : 'Black'))
+const currentStep = computed(() => scanSteps[stepIndex.value]!)
+const isLastStep = computed(() => stepIndex.value === scanSteps.length - 1)
+const currentAnswer = computed(() => new Set(currentStep.value.findAnswer(fen.value)))
 
 const explanation = computed(() =>
-  submitted.value && inspectedSquare.value
-    ? explainSquare(currentStep.value.id, boardScanItem.fen, inspectedSquare.value)
-    : undefined,
+  submitted.value && inspectedSquare.value ? explainSquare(currentStep.value.id, fen.value, inspectedSquare.value) : undefined,
 )
 const arrows = computed(() => explanationArrows(explanation.value))
+
+const advanceLabel = computed(() => {
+  if (!isLastStep.value) return `Next: ${scanSteps[stepIndex.value + 1]!.title}`
+  return session.isLastItem ? 'See results' : 'Next position'
+})
 
 const marks = computed<Record<Square, SquareMark>>(() => {
   if (!submitted.value) {
@@ -60,7 +59,7 @@ const tally = computed(() => {
 })
 
 function toggleSquare(square: Square) {
-  if (submitted.value && placement[square]) inspectedSquare.value = square
+  if (submitted.value && placement.value[square]) inspectedSquare.value = square
   if (submitted.value) return
   const next = new Set(selectedSquares.value)
   if (next.has(square)) next.delete(square)
@@ -70,19 +69,31 @@ function toggleSquare(square: Square) {
 
 function submit() {
   submitted.value = true
+  session.recordStep({ step: currentStep.value.id, ...tally.value })
   const graded = Object.entries(marks.value)
   inspectedSquare.value = (graded.find(([, mark]) => mark === 'wrong') ?? graded.find(([, mark]) => mark === 'missed'))?.[0]
 }
 
-function advance() {
-  if (isLastStep.value) {
-    router.push('/results')
-    return
-  }
-  stepIndex.value += 1
+function resetStep() {
   selectedSquares.value = new Set()
   submitted.value = false
   inspectedSquare.value = undefined
+}
+
+function advance() {
+  if (!isLastStep.value) {
+    stepIndex.value += 1
+    resetStep()
+    return
+  }
+  const wasLastItem = session.isLastItem
+  session.finishItem()
+  if (wasLastItem) {
+    router.push('/results')
+    return
+  }
+  stepIndex.value = 0
+  resetStep()
 }
 
 function handleKeydown(event: KeyboardEvent) {
@@ -114,13 +125,13 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleKeydown))
       </RouterLink>
       <div class="flex-1">
         <div class="mb-1.5 flex justify-between text-xs font-medium text-stone-500 dark:text-stone-400">
-          <span>Board scan · Level 1 · Untimed</span>
-          <span class="tabular-nums">{{ boardScanItem.itemNumber }} / {{ boardScanItem.itemCount }}</span>
+          <span>Board scan</span>
+          <span class="tabular-nums">{{ session.itemIndex + 1 }} / {{ session.positions.length }}</span>
         </div>
         <div class="h-1.5 overflow-hidden rounded-full bg-stone-200 dark:bg-stone-800">
           <div
             class="h-full rounded-full bg-accent transition-all"
-            :style="{ width: `${((boardScanItem.itemNumber - 1) / boardScanItem.itemCount) * 100}%` }"
+            :style="{ width: `${(session.completedItems.length / session.positions.length) * 100}%` }"
           />
         </div>
       </div>
@@ -138,7 +149,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleKeydown))
       </div>
 
       <aside class="space-y-5">
-        <StepIndicator :steps="boardScanItem.steps.map((step) => step.title)" :current-index="stepIndex" />
+        <StepIndicator :steps="scanSteps.map((step) => step.title)" :current-index="stepIndex" />
 
         <div>
           <p class="text-xs font-semibold tracking-wide text-stone-500 uppercase dark:text-stone-400">
@@ -167,7 +178,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleKeydown))
           class="flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3 font-semibold text-accent-foreground shadow-sm transition hover:brightness-110 active:scale-[0.99]"
           @click="submitted ? advance() : submit()"
         >
-          {{ submitted ? (isLastStep ? 'Finish item' : `Next: ${boardScanItem.steps[stepIndex + 1]?.title}`) : 'Check' }}
+          {{ submitted ? advanceLabel : 'Check' }}
           <kbd class="hidden rounded bg-black/15 px-1.5 py-0.5 font-sans text-xs font-medium sm:inline">
             {{ submitted ? 'Space' : 'Enter' }}
           </kbd>

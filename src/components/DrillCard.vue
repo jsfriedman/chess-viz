@@ -2,10 +2,10 @@
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 import { parsePlacement } from '@/chess/board'
-import type { DrillSummary } from '@/mock/mockData'
+import type { DrillSummary } from '@/drills/catalog'
 import ChessBoard, { type SquareMark } from './ChessBoard.vue'
 
-const props = defineProps<{ drill: DrillSummary; to?: string }>()
+const props = defineProps<{ drill: DrillSummary }>()
 
 const placement = computed(() => parsePlacement(props.drill.previewFen))
 const marks = computed<Record<string, SquareMark>>(() =>
@@ -15,11 +15,11 @@ const marks = computed<Record<string, SquareMark>>(() =>
 
 <template>
   <component
-    :is="to ? RouterLink : 'div'"
-    :to="to"
+    :is="drill.route ? RouterLink : 'div'"
+    :to="drill.route"
     class="group flex gap-4 rounded-2xl border border-stone-200 bg-white p-4 transition-all dark:border-stone-800 dark:bg-stone-900"
     :class="
-      to
+      drill.route
         ? 'hover:-translate-y-0.5 hover:border-accent/50 hover:shadow-lg hover:shadow-stone-900/5 focus-visible:outline-2 focus-visible:outline-accent'
         : 'opacity-70'
     "
@@ -31,7 +31,7 @@ const marks = computed<Record<string, SquareMark>>(() =>
       <div class="flex items-start justify-between gap-2">
         <h3 class="font-semibold tracking-tight">{{ drill.title }}</h3>
         <svg
-          v-if="to"
+          v-if="drill.route"
           viewBox="0 0 24 24"
           class="size-5 shrink-0 text-stone-400 transition-transform group-hover:translate-x-0.5 group-hover:text-accent"
           fill="none"
@@ -50,9 +50,7 @@ const marks = computed<Record<string, SquareMark>>(() =>
         >
           {{ mode }}
         </span>
-        <span v-if="drill.personalBest" class="ml-auto text-xs text-stone-500 tabular-nums dark:text-stone-400">
-          Best {{ drill.personalBest }}
-        </span>
+        <span v-if="!drill.route" class="ml-auto text-xs font-medium text-stone-400">Soon</span>
       </div>
     </div>
   </component>
