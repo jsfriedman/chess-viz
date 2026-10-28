@@ -39,5 +39,16 @@ const navigationLinks = [
     <main class="mx-auto w-full max-w-5xl flex-1 px-4 pt-6 pb-16 sm:pt-10">
       <RouterView />
     </main>
+
+    <footer class="mx-auto w-full max-w-5xl px-4 pb-6 text-xs text-stone-400 dark:text-stone-600">
+      Pieces by
+      <a
+        href="https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces"
+        class="underline hover:text-stone-600 dark:hover:text-stone-400"
+        >Colin M.L. Burnett</a
+      >, <a href="https://creativecommons.org/licenses/by-sa/3.0/" class="underline hover:text-stone-600 dark:hover:text-stone-400">CC BY-SA 3.0</a>
+      ·
+      <a href="https://github.com/jsfriedman/chess-viz" class="underline hover:text-stone-600 dark:hover:text-stone-400">Source</a>
+    </footer>
   </div>
 </template>
