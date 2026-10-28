@@ -7,7 +7,7 @@ Web app that trains chess beginners (~0–1400) to read the board faster and mor
 - Static SPA, public GitHub repo, GitHub Pages via Actions (also validates puzzle packs on PRs)
 - Progress in localStorage behind a `ProgressStore` interface (backend-swappable later)
 - Light testing: unit tests for drill logic, answer computation, puzzle validator; one Playwright smoke test
-- MIT code; cburnett pieces (CC BY-SA / GPLv2+) and Lichess puzzle DB (CC0) credited
+- No license (all rights reserved) for now; third-party credits kept: cburnett pieces (CC BY-SA 3.0) in footer + README, bundled dependency licenses emitted to `third-party-licenses.txt`, Lichess puzzle DB (CC0) credited when seeded
 
 ## Sessions
 - Difficulty 1–5 per drill

@@ -48,6 +48,8 @@ const navigationLinks = [
         >Colin M.L. Burnett</a
       >, <a href="https://creativecommons.org/licenses/by-sa/3.0/" class="underline hover:text-stone-600 dark:hover:text-stone-400">CC BY-SA 3.0</a>
       ·
+      <a href="./third-party-licenses.txt" class="underline hover:text-stone-600 dark:hover:text-stone-400">Licenses</a>
+      ·
       <a href="https://github.com/jsfriedman/chess-viz" class="underline hover:text-stone-600 dark:hover:text-stone-400">Source</a>
     </footer>
   </div>
