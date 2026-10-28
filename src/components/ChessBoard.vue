@@ -58,6 +58,13 @@ const cells = computed(() =>
   }),
 )
 
+const arrowStyles: Readonly<Record<BoardArrow['kind'], { color: string; dashed: boolean }>> = {
+  attack: { color: 'var(--arrow-attack)', dashed: false },
+  defend: { color: 'var(--arrow-defend)', dashed: true },
+  path: { color: 'var(--accent)', dashed: false },
+  solution: { color: 'var(--mark-missed)', dashed: true },
+}
+
 const arrowHeadLength = 0.3
 const arrowTargetInset = 0.28
 
@@ -73,8 +80,7 @@ const arrowShapes = computed(() =>
       y: from.row + 0.5,
       angle: (Math.atan2(deltaRow, deltaColumn) * 180) / Math.PI,
       length: Math.hypot(deltaColumn, deltaRow) - arrowTargetInset,
-      color: arrow.kind === 'attack' ? 'var(--arrow-attack)' : 'var(--arrow-defend)',
-      dashed: arrow.kind === 'defend',
+      ...arrowStyles[arrow.kind],
     }
   }),
 )

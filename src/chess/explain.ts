@@ -1,4 +1,4 @@
-import type { BoardArrow, Color, Square } from './board'
+import { colorName, type BoardArrow, type Color, type Square } from './board'
 import { analyzeHanging, type HangingAnalysis } from './hanging'
 import { colorOf, loadPosition, pieceAt, type BoardPiece } from './position'
 import { capturesOf, checkingMovesFrom, type ScanMove } from './scan'
@@ -11,7 +11,7 @@ export type Explanation =
 
 function explainChecks(fen: string, target: BoardPiece, toMove: Color): Explanation {
   if (colorOf(target.piece) !== toMove) {
-    return { kind: 'moves', target, matches: false, verdict: 'Not to move', moves: [], note: 'Opponent piece.' }
+    return { kind: 'moves', target, matches: false, verdict: 'Wrong side', moves: [], note: `${colorName(toMove)} to move.` }
   }
   const moves = checkingMovesFrom(fen, target.square)
   return {
@@ -26,7 +26,7 @@ function explainChecks(fen: string, target: BoardPiece, toMove: Color): Explanat
 
 function explainCaptures(fen: string, target: BoardPiece, toMove: Color): Explanation {
   if (colorOf(target.piece) === toMove) {
-    return { kind: 'moves', target, matches: false, verdict: 'Own piece', moves: [], note: 'Side to move can’t capture it.' }
+    return { kind: 'moves', target, matches: false, verdict: 'Own piece', moves: [], note: `${colorName(toMove)} to move.` }
   }
   const moves = capturesOf(fen, target.square)
   return {

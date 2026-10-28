@@ -17,11 +17,14 @@ Web app that trains chess beginners (~0–1400) to read the board faster and mor
 
 ## Drills
 1. **Coordinates** — Find (click named square), Name (type/pick highlighted square), Color (light/dark, no board). Orientation: White / Black / Random.
-2. **Piece reach** — Reach (click all attacked squares; blockers + capturables at higher levels); Knight path (click the shortest path).
+2. **Piece reach** — generated positions; setup picks modes (alternated) + difficulty, remembered.
+   - Reach: click every square the highlighted piece can move to (pseudo-legal, no pawns). L1 N/B/R alone · L2 +Q/K · L3 own blockers · L4–5 own blockers + capturable enemies (no king).
+   - Knight path: click hops to the target; tapping the target auto-checks, Backspace/tap-last undoes. Distance 2 · 3 · 4–5 · 3–4 with 5 own pawns · 4–6 with 10. Wrong → shortest path closest to the attempt shown dashed.
 3. **Board scan** — toggleable modes, done as sequential steps on one position: Checks → Captures → Hanging.
    - Checks: pieces of side to move that can give check
    - Captures: enemy pieces side to move can capture
    - Hanging (both colors): static exchange evaluation. Captures on the square play out cheapest-first, x-rays included, and either side may stop. A king only recaptures onto an unattacked square. Hanging = the attacker nets material.
+   - Board oriented to side to move; turn badge above board; prompts name the color
    - Tap to toggle squares, submit; feedback shows correct / wrong / missed
    - After submit, tap any piece to see why. Arrows show attackers (solid) and defenders (dashed), with a one-line reason: checking moves, legal captures, or the exchange line and its material result.
 4. **Flash memory** — position shown N seconds, hidden, then 3–5 generated questions (e.g. "What's on e4?", "Is the c6 knight defended?").

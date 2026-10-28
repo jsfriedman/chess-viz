@@ -1,34 +1,36 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { RouterLink, useRouter } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 import MarkBadge from '@/components/MarkBadge.vue'
-import { useBoardScanSession } from '@/drills/boardScan/sessionStore'
-import { scanSteps } from '@/drills/boardScan/steps'
-import { summarizeSession } from '@/drills/boardScan/summary'
+import { sessionDrills } from '@/drills/sessions'
+import { summarizeSession } from '@/drills/summary'
 
+const route = useRoute()
 const router = useRouter()
-const session = useBoardScanSession()
-if (session.completedItems.length === 0) router.replace('/')
+const drill = sessionDrills[String(route.params.drill)]
+const session = drill?.useSession()
+if (!session || session.completedItems.length === 0) router.replace('/')
 
-const summary = computed(() => summarizeSession(session.completedItems))
+const summary = computed(() => summarizeSession(session?.completedItems ?? []))
 
 const stats = computed(() => [
   { label: 'Accuracy', value: `${summary.value.accuracy}%` },
-  { label: 'Avg per position', value: `${summary.value.averageSeconds}s` },
+  { label: 'Avg time', value: `${summary.value.averageSeconds}s` },
 ])
 
-const stepTitle = (stepId: string) => scanSteps.find((step) => step.id === stepId)?.title ?? stepId
+const stepTitle = (stepId: string) => drill?.stepTitles[stepId] ?? stepId
 
 function trainAgain() {
+  if (!drill || !session) return
   session.start()
-  router.push('/train/board-scan')
+  router.push(drill.route)
 }
 </script>
 
 <template>
   <div v-if="summary.itemCount" class="mx-auto max-w-xl space-y-8">
     <section class="text-center">
-      <p class="text-sm font-medium text-stone-500 dark:text-stone-400">Board scan</p>
+      <p class="text-sm font-medium text-stone-500 dark:text-stone-400">{{ drill?.title }}</p>
       <p class="mt-3 text-6xl font-semibold tracking-tight tabular-nums">
         {{ summary.perfectItems }}<span class="text-stone-400 dark:text-stone-600">/{{ summary.itemCount }}</span>
       </p>
@@ -47,7 +49,7 @@ function trainAgain() {
     </section>
 
     <section aria-labelledby="items-heading">
-      <h2 id="items-heading" class="mb-3 text-sm font-medium text-stone-500 dark:text-stone-400">Positions</h2>
+      <h2 id="items-heading" class="mb-3 text-sm font-medium text-stone-500 dark:text-stone-400">{{ drill?.itemLabel }}</h2>
       <ol class="flex flex-wrap gap-3">
         <li v-for="(perfect, index) in summary.itemsPerfect" :key="index" class="flex flex-col items-center gap-1">
           <MarkBadge :mark="perfect ? 'correct' : 'wrong'" class="size-7" />
@@ -57,13 +59,13 @@ function trainAgain() {
     </section>
 
     <section aria-labelledby="steps-heading">
-      <h2 id="steps-heading" class="mb-3 text-sm font-medium text-stone-500 dark:text-stone-400">By step</h2>
+      <h2 id="steps-heading" class="mb-3 text-sm font-medium text-stone-500 dark:text-stone-400">Breakdown</h2>
       <ul class="space-y-3 rounded-2xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900">
         <li v-for="step in summary.steps" :key="step.step">
           <div class="mb-1.5 flex justify-between text-sm">
             <span class="font-medium">{{ stepTitle(step.step) }}</span>
             <span class="text-stone-500 tabular-nums dark:text-stone-400">
-              {{ step.found }}/{{ step.total }} found · {{ step.wrong }} wrong
+              {{ step.found }}/{{ step.total }}<template v-if="step.wrong"> · {{ step.wrong }} wrong</template>
             </span>
           </div>
           <div class="h-2 overflow-hidden rounded-full bg-stone-100 dark:bg-stone-800">

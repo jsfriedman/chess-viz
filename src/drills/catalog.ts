@@ -21,18 +21,19 @@ export const drills: readonly DrillSummary[] = [
     route: '/train/board-scan',
   },
   {
-    id: 'coordinates',
-    title: 'Coordinates',
-    modes: ['Find', 'Name', 'Color'],
-    previewFen: '8/8/8/8/8/8/8/8 w - - 0 1',
-    previewSquares: ['e4'],
-  },
-  {
     id: 'piece-reach',
     title: 'Piece reach',
     modes: ['Reach', 'Knight path'],
     previewFen: '8/8/8/8/3N4/8/8/8 w - - 0 1',
     previewSquares: ['c6', 'e6', 'f5', 'f3', 'e2', 'c2', 'b3', 'b5'],
+    route: '/train/piece-reach',
+  },
+  {
+    id: 'coordinates',
+    title: 'Coordinates',
+    modes: ['Find', 'Name', 'Color'],
+    previewFen: '8/8/8/8/8/8/8/8 w - - 0 1',
+    previewSquares: ['e4'],
   },
   {
     id: 'flash-memory',

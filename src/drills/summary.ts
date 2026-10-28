@@ -1,7 +1,5 @@
-import type { ScanStepId } from '@/chess/explain'
-
 export interface StepResult {
-  step: ScanStepId
+  step: string
   found: number
   total: number
   wrong: number
@@ -14,7 +12,7 @@ export interface ItemResult {
 }
 
 export interface StepSummary {
-  step: ScanStepId
+  step: string
   found: number
   total: number
   wrong: number

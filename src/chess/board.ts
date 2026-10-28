@@ -8,7 +8,7 @@ export type Placement = Readonly<Record<Square, PieceCode>>
 export interface BoardArrow {
   from: Square
   to: Square
-  kind: 'attack' | 'defend'
+  kind: 'attack' | 'defend' | 'path' | 'solution'
 }
 
 export const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] as const
@@ -37,8 +37,29 @@ export function parsePlacement(fen: string): Placement {
   )
 }
 
+export function placementToFen(placement: Placement, side: Color = 'w'): string {
+  const rows = [...ranks].reverse().map((rank) =>
+    files
+      .map((file) => {
+        const piece = placement[`${file}${rank}`]
+        if (!piece) return '1'
+        const symbol = piece.charAt(1)
+        return piece[0] === 'w' ? symbol : symbol.toLowerCase()
+      })
+      .join('')
+      .replace(/1+/g, (run) => String(run.length)),
+  )
+  return `${rows.join('/')} ${side} - - 0 1`
+}
+
+export const allSquares: readonly Square[] = ranks.flatMap((rank) => files.map((file) => `${file}${rank}`))
+
 export function sideToMove(fen: string): Color {
   return fen.trim().split(/\s+/)[1] === 'b' ? 'b' : 'w'
+}
+
+export function colorName(color: Color): 'White' | 'Black' {
+  return color === 'w' ? 'White' : 'Black'
 }
 
 export function isLightSquare(square: Square): boolean {

@@ -7,7 +7,13 @@ export const router = createRouter({
   routes: [
     { path: '/', name: 'home', component: HomeView },
     { path: '/train/board-scan', name: 'board-scan', component: () => import('./views/BoardScanSessionView.vue') },
-    { path: '/results', name: 'results', component: () => import('./views/ResultsView.vue') },
+    { path: '/train/piece-reach', name: 'piece-reach', component: () => import('./views/PieceReachSetupView.vue') },
+    {
+      path: '/train/piece-reach/session',
+      name: 'piece-reach-session',
+      component: () => import('./views/PieceReachSessionView.vue'),
+    },
+    { path: '/results/:drill', name: 'results', component: () => import('./views/ResultsView.vue') },
     { path: '/theme', name: 'theme', component: () => import('./views/ThemeView.vue') },
   ],
   scrollBehavior: () => ({ top: 0 }),
