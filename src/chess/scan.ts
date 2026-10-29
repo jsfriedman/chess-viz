@@ -11,7 +11,7 @@ export interface ScanMove {
   san: string
 }
 
-function legalMoves(chess: Chess): ScanMove[] {
+export function legalMoves(chess: Chess): ScanMove[] {
   return chess.moves({ verbose: true }).map((move) => ({
     from: move.from,
     to: move.to,
@@ -21,7 +21,7 @@ function legalMoves(chess: Chess): ScanMove[] {
   }))
 }
 
-const givesCheck = (move: ScanMove) => /[+#]$/.test(move.san)
+export const givesCheck = (move: ScanMove) => /[+#]$/.test(move.san)
 
 export function checkingMovesFrom(fen: string, square: Square): ScanMove[] {
   return legalMoves(loadPosition(fen)).filter((move) => move.from === square && givesCheck(move))

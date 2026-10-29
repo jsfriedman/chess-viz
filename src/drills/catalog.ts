@@ -23,9 +23,9 @@ export const drills: readonly DrillSummary[] = [
   {
     id: 'piece-reach',
     title: 'Piece reach',
-    modes: ['Reach', 'Knight path'],
-    previewFen: '8/8/8/8/3N4/8/8/8 w - - 0 1',
-    previewSquares: ['c6', 'e6', 'f5', 'f3', 'e2', 'c2', 'b3', 'b5'],
+    modes: ['Reach', 'Path'],
+    previewFen: '8/8/8/8/3Q4/8/8/8 w - - 0 1',
+    previewSquares: ['d5', 'd6', 'd7', 'd8', 'c5', 'b6', 'a7', 'e5', 'f6', 'g7', 'h8', 'a4', 'b4', 'c4', 'e4', 'f4', 'g4', 'h4', 'd3', 'd2', 'd1', 'c3', 'b2', 'a1', 'e3', 'f2', 'g1'],
     route: '/train/piece-reach',
   },
   {

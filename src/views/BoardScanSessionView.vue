@@ -30,8 +30,9 @@ const inspectedSquare = ref<Square>()
 const fen = computed(() => session.currentItem!.fen)
 const placement = computed(() => parsePlacement(fen.value))
 const toMove = computed(() => sideToMove(fen.value))
-const currentStep = computed(() => scanSteps[stepIndex.value]!)
-const isLastStep = computed(() => stepIndex.value === scanSteps.length - 1)
+const steps = computed(() => scanSteps.filter((step) => session.currentItem!.steps.includes(step.id)))
+const currentStep = computed(() => steps.value[stepIndex.value]!)
+const isLastStep = computed(() => stepIndex.value === steps.value.length - 1)
 const currentAnswer = computed(() => new Set(currentStep.value.findAnswer(fen.value)))
 
 const explanation = computed(() =>
@@ -40,7 +41,7 @@ const explanation = computed(() =>
 const arrows = computed(() => explanationArrows(explanation.value))
 
 const advanceLabel = computed(() => {
-  if (!isLastStep.value) return `Next: ${scanSteps[stepIndex.value + 1]!.title}`
+  if (!isLastStep.value) return `Next: ${steps.value[stepIndex.value + 1]!.title}`
   return session.isLastItem ? 'See results' : 'Next position'
 })
 
@@ -113,7 +114,7 @@ useExerciseKeys({ isSubmitted: () => submitted.value, submit, advance })
         />
       </template>
 
-      <StepIndicator :steps="scanSteps.map((step) => step.title)" :current-index="stepIndex" />
+      <StepIndicator v-if="steps.length > 1" :steps="steps.map((step) => step.title)" :current-index="stepIndex" />
 
       <p class="text-lg font-medium text-balance">{{ currentStep.prompt(toMove) }}</p>
 

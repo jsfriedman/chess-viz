@@ -6,7 +6,12 @@ export const router = createRouter({
   history: createWebHashHistory(),
   routes: [
     { path: '/', name: 'home', component: HomeView },
-    { path: '/train/board-scan', name: 'board-scan', component: () => import('./views/BoardScanSessionView.vue') },
+    { path: '/train/board-scan', name: 'board-scan', component: () => import('./views/BoardScanSetupView.vue') },
+    {
+      path: '/train/board-scan/session',
+      name: 'board-scan-session',
+      component: () => import('./views/BoardScanSessionView.vue'),
+    },
     { path: '/train/piece-reach', name: 'piece-reach', component: () => import('./views/PieceReachSetupView.vue') },
     {
       path: '/train/piece-reach/session',

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import KnightPathExercise from '@/components/pieceReach/KnightPathExercise.vue'
+import PathExercise from '@/components/pieceReach/PathExercise.vue'
 import ReachExercise from '@/components/pieceReach/ReachExercise.vue'
 import SessionHeader from '@/components/SessionHeader.vue'
 import { usePieceReachSession } from '@/drills/pieceReach/sessionStore'
@@ -41,7 +41,7 @@ function advance() {
       @graded="recordResult"
       @advance="advance"
     />
-    <KnightPathExercise
+    <PathExercise
       v-else
       :key="session.itemIndex"
       :item="item"

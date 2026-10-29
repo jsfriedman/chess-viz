@@ -8,7 +8,8 @@
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "vue-tsc -b",
-    "test": "vitest run"
+    "test": "vitest run",
+    "positions": "tsx scripts/positions/build.ts"
   },
   "dependencies": {
     "chess.js": "^1.4.0",
@@ -21,6 +22,7 @@
     "@types/node": "^26.6.6",
     "@vitejs/plugin-vue": "^6.0.10",
     "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.15",
     "typescript": "^6.0.3",
     "vite": "^8.3.5",
     "vitest": "^5.0.5",

@@ -5,21 +5,22 @@ import ExerciseButton from '@/components/ExerciseButton.vue'
 import ExerciseLayout from '@/components/ExerciseLayout.vue'
 import FeedbackLegend from '@/components/FeedbackLegend.vue'
 import MarkBadge from '@/components/MarkBadge.vue'
-import { parsePlacement, type BoardArrow, type Square } from '@/chess/board'
+import { parsePlacement, pieceName, type BoardArrow, type Square } from '@/chess/board'
 import { useExerciseKeys } from '@/composables/useExerciseKeys'
-import type { KnightPathItem } from '@/drills/pieceReach/items'
-import { gradeKnightPath, type KnightPathGrade } from '@/drills/pieceReach/knightPath'
+import type { PathItem } from '@/drills/pieceReach/items'
+import { gradePath, pathPiece, type PathGrade } from '@/drills/pieceReach/path'
 import type { StepResult } from '@/drills/summary'
 
-const props = defineProps<{ item: KnightPathItem; advanceLabel: string }>()
+const props = defineProps<{ item: PathItem; advanceLabel: string }>()
 const emit = defineEmits<{ graded: [result: StepResult]; advance: [] }>()
 
 const maxPathLength = 10
 
 const path = ref<readonly Square[]>([])
-const grade = ref<KnightPathGrade>()
+const grade = ref<PathGrade>()
 
 const placement = computed(() => parsePlacement(props.item.fen))
+const name = computed(() => pieceName(pathPiece(props.item)))
 const solved = computed(() => grade.value?.verdict === 'shortest')
 
 function hops(squares: readonly Square[], kind: BoardArrow['kind']): BoardArrow[] {
@@ -50,6 +51,8 @@ const marks = computed<Record<Square, SquareMark>>(() => {
   )
 })
 
+const plural = (count: number) => `${count} ${count === 1 ? 'move' : 'moves'}`
+
 const verdictText = computed(() => {
   const result = grade.value
   if (!result) return ''
@@ -58,11 +61,11 @@ const verdictText = computed(() => {
   const from = result.problemIndex ? path.value[result.problemIndex - 1] : props.item.start
   switch (result.verdict) {
     case 'shortest':
-      return `Shortest path · ${shortest} moves`
+      return `Shortest path · ${plural(shortest)}`
     case 'longer':
-      return `${path.value.length} moves · shortest is ${shortest}`
+      return `${plural(path.value.length)} · shortest is ${shortest}`
     case 'illegal-hop':
-      return `${from} → ${problem} isn’t a knight move`
+      return `The ${name.value} can’t go ${from} → ${problem}`
     case 'blocked':
       return `${problem} is blocked by your own pawn`
     case 'unfinished':
@@ -84,8 +87,8 @@ function undo() {
 }
 
 function submit() {
-  grade.value = gradeKnightPath(props.item, path.value)
-  emit('graded', { step: 'knight-path', found: solved.value ? 1 : 0, total: 1, wrong: 0 })
+  grade.value = gradePath(props.item, path.value)
+  emit('graded', { step: 'path', found: solved.value ? 1 : 0, total: 1, wrong: 0 })
 }
 
 useExerciseKeys({ isSubmitted: () => grade.value !== undefined, submit, advance: () => emit('advance'), undo })
@@ -98,9 +101,11 @@ useExerciseKeys({ isSubmitted: () => grade.value !== undefined, submit, advance:
     </template>
 
     <div>
-      <p class="text-lg font-medium text-balance">Knight to {{ item.target }} in the fewest moves.</p>
+      <p class="text-lg font-medium text-balance first-letter:uppercase">
+        {{ name }} to {{ item.target }} in the fewest moves.
+      </p>
       <div v-if="!grade" class="mt-2 flex h-8 items-center gap-3 text-sm text-stone-500 tabular-nums dark:text-stone-400">
-        <span>{{ path.length }} {{ path.length === 1 ? 'move' : 'moves' }}</span>
+        <span>{{ plural(path.length) }}</span>
         <button
           v-if="path.length"
           type="button"

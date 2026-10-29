@@ -18,7 +18,7 @@ export interface SessionDrill {
 export const sessionDrills: Readonly<Record<string, SessionDrill>> = {
   'board-scan': {
     title: 'Board scan',
-    route: '/train/board-scan',
+    route: '/train/board-scan/session',
     itemLabel: 'Positions',
     stepTitles: { checks: 'Checks', captures: 'Captures', hanging: 'Hanging' },
     useSession: useBoardScanSession,
@@ -27,7 +27,7 @@ export const sessionDrills: Readonly<Record<string, SessionDrill>> = {
     title: 'Piece reach',
     route: '/train/piece-reach/session',
     itemLabel: 'Items',
-    stepTitles: { reach: 'Reach', 'knight-path': 'Knight path' },
+    stepTitles: { reach: 'Reach', path: 'Path' },
     useSession: usePieceReachSession,
   },
 }

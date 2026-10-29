@@ -5,8 +5,8 @@ import ExerciseButton from '@/components/ExerciseButton.vue'
 import ExerciseLayout from '@/components/ExerciseLayout.vue'
 import FeedbackLegend from '@/components/FeedbackLegend.vue'
 import TallyLine from '@/components/TallyLine.vue'
-import { describePiece, parsePlacement, type Square } from '@/chess/board'
-import { reachableSquares } from '@/chess/reach'
+import { describePiece, parsePlacement, type BoardArrow, type Square } from '@/chess/board'
+import { reachableSquares, reachEndpoints } from '@/chess/reach'
 import { useExerciseKeys } from '@/composables/useExerciseKeys'
 import { gradeSelection, selectionMarks, tallyMarks } from '@/drills/grading'
 import type { ReachItem } from '@/drills/pieceReach/items'
@@ -23,6 +23,12 @@ const pieceDescription = computed(() => describePiece(placement.value[props.item
 const answer = computed(() => new Set(reachableSquares(placement.value, props.item.square)))
 const gradedMarks = computed(() => gradeSelection(answer.value, selectedSquares.value))
 const tally = computed(() => tallyMarks(gradedMarks.value, answer.value.size))
+
+const arrows = computed<BoardArrow[]>(() =>
+  submitted.value
+    ? reachEndpoints(placement.value, props.item.square).map((to) => ({ from: props.item.square, to, kind: 'path' }))
+    : [],
+)
 
 const marks = computed<Record<Square, SquareMark>>(() => ({
   ...(submitted.value ? gradedMarks.value : selectionMarks(selectedSquares.value)),
@@ -48,7 +54,7 @@ useExerciseKeys({ isSubmitted: () => submitted.value, submit, advance: () => emi
 <template>
   <ExerciseLayout>
     <template #board>
-      <ChessBoard :placement="placement" :marks="marks" interactive @square-click="toggleSquare" />
+      <ChessBoard :placement="placement" :marks="marks" :arrows="arrows" interactive @square-click="toggleSquare" />
     </template>
 
     <p class="text-lg font-medium text-balance">Where can the {{ pieceDescription }} on {{ item.square }} move?</p>

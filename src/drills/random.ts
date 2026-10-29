@@ -15,3 +15,12 @@ export function shuffle<T>(items: readonly T[], random: Random): T[] {
 export function sample<T>(items: readonly T[], count: number, random: Random): T[] {
   return shuffle(items, random).slice(0, count)
 }
+
+// Deterministic generator for tests and reproducible builds
+export function seededRandom(seed: number): Random {
+  let state = seed >>> 0
+  return () => {
+    state = (Math.imul(state, 1664525) + 1013904223) >>> 0
+    return state / 2 ** 32
+  }
+}
